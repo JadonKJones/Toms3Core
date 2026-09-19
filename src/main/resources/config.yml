@@ -9,6 +9,8 @@ general:
   # THIS IS ONLY FOR toms3.cc, MOST MESSAGES CANNOT BE CUSTOMIZED!!!
   # This will be removed soon and replaced with locale-based messages (Hopefully).
   enable-spanish-translation: false
+  # Japanese translations, same caveats as enable-spanish-translation above
+  enable-japanese-translation: false
   # Enable cache system logging (logs playerdata creation & last seen updates)
   # Can be annoying if you have a lot of players, so be careful
   # By default, this is set to true
@@ -31,14 +33,17 @@ commands:
     message:
       en: "You can vote the server via: <b>url</b>"
       es: "Puedes votar por el servidor entrando a: <b>url</b>"
+      ja: "以下のURLからサーバーに投票できます: <b>url</b>"
   toggleannouncements:
     message:
       "on":
         en: "Announcements are now <b>ON</b>."
         es: "Los anuncios ahora están <b>activados</b>."
+        ja: "アナウンスが<b>オン</b>になりました。"
       "off":
         en: "Announcements are now <b>OFF</b>."
         es: "Los anuncios ahora están <b>desactivados</b>."
+        ja: "アナウンスが<b>オフ</b>になりました。"
 
 # Utilities that may be useful or not
 utilities:
@@ -110,32 +115,43 @@ misc:
       first-join:
         en: "Welcome to the server!"
         es: "¡Bienvenido al servidor!"
+        ja: "サーバーへようこそ!"
       general:
         en: "Welcome back to the server!"
         es: "¡Bienvenido devuelta al servidor!"
+        ja: "サーバーへおかえりなさい!"
     # Join title
     join-title-message:
       # You can disable this by setting everything to ""
       # This also applies to the action bar
       en: "Welcome"
       es: "Bienvenido"
+      ja: "ようこそ"
     # Join action bar
     join-action-bar-message:
       en: "Welcome"
       es: "Bienvenido"
+      ja: "ようこそ"
   # Simple announcements system, create as many as you want
   # Selection is purely random and repeated announcements can appear again.
   announcements:
     enable: true
     # Time in seconds
     timer: 60
+    # If a message is missing its "es"/"ja" text, auto-translate it from "en" using a free unofficial
+    # Google Translate endpoint (same trick Python's "googletrans" library uses). No API key required,
+    # but it sends the message text to Google and isn't a supported API, so it can break at any time.
+    # Manual "es"/"ja" text always takes priority over the auto-translation.
+    autotranslate: true
     messages:
       example:
         en: "<gold>Example."
         es: "<gold>Ejemplo."
+        ja: "<gold>例。"
       example-two:
         en: "<gold>Example two."
         es: "<gold>Ejemplo dos."
+        ja: "<gold>例その二。"
   # Emergent announcements system
   # Useful for emergent announcements like "Server is restarting soon" // "We are currently suffering x problem"
   emergent-announcements:
@@ -143,10 +159,13 @@ misc:
     enable: false
     # Time in seconds (should be shorter than normal announcement's timer)
     timer: 15
+    # Same auto-translate behavior as misc.announcements.autotranslate
+    autotranslate: true
     messages:
       example:
         en: "<gold>The server is currently suffering a problem, so expect low performance."
         es: "<gold>El servidor está teniendo problemas, así que puede que haya bajo rendimiento."
+        ja: "<gold>サーバーが現在問題を抱えているため、パフォーマンスが低下する可能性があります。"
 
 # Do not touch.
-config-version: 7
+config-version: 9

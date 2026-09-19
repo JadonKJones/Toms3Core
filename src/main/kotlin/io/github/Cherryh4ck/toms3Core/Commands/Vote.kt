@@ -11,8 +11,11 @@ class Vote(private val plugin : Toms3Core) : TabExecutor {
         if (sender is Player) {
             val locale = sender.locale().toString()
             val isSpanish = locale.startsWith("es")
+            val isJapanese = locale.startsWith("ja")
             val message = if (isSpanish && plugin.spanish_enabled) {
                 plugin.minimessage.deserialize("${plugin.prefix} ${plugin.vote_message_es}")
+            } else if (isJapanese && plugin.japanese_enabled) {
+                plugin.minimessage.deserialize("${plugin.prefix} ${plugin.vote_message_ja}")
             } else {
                 plugin.minimessage.deserialize("${plugin.prefix} ${plugin.vote_message_en}")
             }

@@ -30,10 +30,12 @@ class Playtime(private val plugin: Toms3Core) : TabExecutor {
         val targetUser : String
         val userLocale : String
         val isSpanish : Boolean
+        val isJapanese : Boolean
 
         if (sender is Player){
             userLocale = sender.locale().toString()
             isSpanish = userLocale.startsWith("es")
+            isJapanese = userLocale.startsWith("ja")
             targetUser = if (args.isEmpty()) {
                 sender.name
             } else{
@@ -42,6 +44,7 @@ class Playtime(private val plugin: Toms3Core) : TabExecutor {
         }
         else{
             isSpanish = true
+            isJapanese = false
             if (args.isEmpty()){
                 plugin.logToConsole("<red>You need to specify a player to use this command.")
                 return true
@@ -54,6 +57,9 @@ class Playtime(private val plugin: Toms3Core) : TabExecutor {
         if (!validateUsername(targetUser)) {
             val mensaje = if (isSpanish && plugin.spanish_enabled) {
                 minimessage.deserialize("${plugin.prefix} <red>$targetUser no es un nombre de jugador válido.</red>")
+            }
+            else if (isJapanese && plugin.japanese_enabled) {
+                minimessage.deserialize("${plugin.prefix} <red>$targetUser は有効なプレイヤー名ではありません。</red>")
             }
             else {
                 minimessage.deserialize("${plugin.prefix} <red>$targetUser is not a valid player name.</red>")
@@ -85,6 +91,9 @@ class Playtime(private val plugin: Toms3Core) : TabExecutor {
                 val mensaje = if (isSpanish && plugin.spanish_enabled) {
                     minimessage.deserialize("${plugin.prefix} <red>$targetUser nunca entró al servidor o no está en el cache del servidor.</red>")
                 }
+                else if (isJapanese && plugin.japanese_enabled) {
+                    minimessage.deserialize("${plugin.prefix} <red>$targetUser はサーバーに参加したことがないか、サーバーのキャッシュにありません。</red>")
+                }
                 else {
                     minimessage.deserialize("${plugin.prefix} <red>$targetUser has never entered the server or is not in the server cache.</red>")
                 }
@@ -103,6 +112,14 @@ class Playtime(private val plugin: Toms3Core) : TabExecutor {
                 }
                 else{
                     minimessage.deserialize("<gold>${plugin.prefix} Tienes un tiempo de juego de <bold>$result</bold> (<bold>${resultHs}hs</bold>).</gold>")
+                }
+            }
+            else if (isJapanese && plugin.japanese_enabled) {
+                if (offlineplayer.name != sender.name){
+                    minimessage.deserialize("<gold>${plugin.prefix} <bold>${offlineplayer.name}</bold> のプレイ時間は <bold>$result</bold> (<bold>${resultHs}時間</bold>) です。</gold>")
+                }
+                else{
+                    minimessage.deserialize("<gold>${plugin.prefix} あなたのプレイ時間は <bold>$result</bold> (<bold>${resultHs}時間</bold>) です。</gold>")
                 }
             }
             else {

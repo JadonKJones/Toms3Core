@@ -32,7 +32,7 @@ import java.util.UUID
 
 class Toms3Core : JavaPlugin() {
     // -- IMPORTANT --
-    val configVersion = 7
+    val configVersion = 9
     // -- IMPORTANT --
 
     val minimessage = MiniMessage.miniMessage()
@@ -43,6 +43,7 @@ class Toms3Core : JavaPlugin() {
     var prefix = config.getString("general.prefix")
     var discordWebhook = config.getString("general.discord-webhook")
     var spanish_enabled = config.getBoolean("general.enable-spanish-translation")
+    var japanese_enabled = config.getBoolean("general.enable-japanese-translation")
     var cache_system_logging_enabled = config.getBoolean("general.enable-cache-system-logging")
 
     var chunklimits_enable = config.getBoolean("chunk-limits.enable")
@@ -54,11 +55,14 @@ class Toms3Core : JavaPlugin() {
 
     var vote_message_en = config.getString("commands.vote.message.en")
     var vote_message_es = config.getString("commands.vote.message.es")
+    var vote_message_ja = config.getString("commands.vote.message.ja")
 
     var toggleannouncements_message_on_en = config.getString("commands.toggleannouncements.message.on.en")
     var toggleannouncements_message_on_es = config.getString("commands.toggleannouncements.message.on.es")
+    var toggleannouncements_message_on_ja = config.getString("commands.toggleannouncements.message.on.ja")
     var toggleannouncements_message_off_en = config.getString("commands.toggleannouncements.message.off.en")
     var toggleannouncements_message_off_es = config.getString("commands.toggleannouncements.message.off.es")
+    var toggleannouncements_message_off_ja = config.getString("commands.toggleannouncements.message.off.ja")
 
     var op_blacklisted_commands = config.getStringList("utilities.op-command-blacklist.blacklisted-commands")
 
@@ -76,26 +80,34 @@ class Toms3Core : JavaPlugin() {
 
     var motd_general = config.getString("misc.join-events.join-motd.general.en")
     var motd_es = config.getString("misc.join-events.join-motd.general.es")
+    var motd_ja = config.getString("misc.join-events.join-motd.general.ja")
 
     var first_join_motd = config.getString("misc.join-events.join-motd.first-join.en")
     var first_join_motd_es = config.getString("misc.join-events.join-motd.first-join.es")
+    var first_join_motd_ja = config.getString("misc.join-events.join-motd.first-join.ja")
 
     var title_announcement_en = config.getString("misc.join-events.join-title-message.en")
     var title_announcement_es = config.getString("misc.join-events.join-title-message.es")
+    var title_announcement_ja = config.getString("misc.join-events.join-title-message.ja")
 
     var actionbar_announcement_en = config.getString("misc.join-events.join-action-bar-message.en")
     var actionbar_announcement_es = config.getString("misc.join-events.join-action-bar-message.es")
+    var actionbar_announcement_ja = config.getString("misc.join-events.join-action-bar-message.ja")
 
     var announcements_enabled = config.getBoolean("misc.announcements.enable")
     var announcements_timer = config.getInt("misc.announcements.timer")
     var announcements_interval = (20 * announcements_timer).toLong()
     var announcements = config.getConfigurationSection("misc.announcements.messages")
+    var announcements_autotranslate = config.getBoolean("misc.announcements.autotranslate")
 
     var emergent_announcements_enabled = config.getBoolean("misc.emergent-announcements.enable")
     var emergent_announcements_timer = config.getInt("misc.emergent-announcements.timer")
     var emergent_announcements_interval = (20 * emergent_announcements_timer).toLong()
     var emergent_announcements = config.getConfigurationSection("misc.emergent-announcements.messages")
+    var emergent_announcements_autotranslate = config.getBoolean("misc.emergent-announcements.autotranslate")
     val playerDataPath = File(dataFolder, "playerdata")
+
+    private val announcementTranslationCache = java.util.concurrent.ConcurrentHashMap<String, String>()
 
     // Lists
     var haveAnnouncementsDisabled = HashSet<UUID>()
@@ -168,16 +180,20 @@ class Toms3Core : JavaPlugin() {
         prefix = config.getString("general.prefix")
         discordWebhook = config.getString("general.discord-webhook")
         spanish_enabled = config.getBoolean("general.enable-spanish-translation")
+        japanese_enabled = config.getBoolean("general.enable-japanese-translation")
         cache_system_logging_enabled = config.getBoolean("general.enable-cache-system-logging")
         usernameValidationRegex = config.getString("commands.username-validation-regex") ?: "^[a-zA-Z0-9_]{3,16}\$"
         usernameValidationRegexEnabled = usernameValidationRegex.isEmpty()
         dupe_webhook_message = config.getString("commands.dupe.discord-webhook-message")
         vote_message_en = config.getString("commands.vote.message.en")
         vote_message_es = config.getString("commands.vote.message.es")
+        vote_message_ja = config.getString("commands.vote.message.ja")
         toggleannouncements_message_on_en = config.getString("commands.toggleannouncements.message.on.en")
         toggleannouncements_message_on_es = config.getString("commands.toggleannouncements.message.on.es")
+        toggleannouncements_message_on_ja = config.getString("commands.toggleannouncements.message.on.ja")
         toggleannouncements_message_off_en = config.getString("commands.toggleannouncements.message.off.en")
         toggleannouncements_message_off_es = config.getString("commands.toggleannouncements.message.off.es")
+        toggleannouncements_message_off_ja = config.getString("commands.toggleannouncements.message.off.ja")
         op_blacklisted_commands = config.getStringList("utilities.op-command-blacklist.blacklisted-commands")
         chunklimits_enable = config.getBoolean("chunk-limits.enable")
         tile_entities_limit = config.getInt("chunk-limits.tile-entities.entity-limit")
@@ -191,20 +207,26 @@ class Toms3Core : JavaPlugin() {
         patch_vclip_exploit = config.getBoolean("patches.nether.patch-vclip-exploit.enable")
         motd_general = config.getString("misc.join-events.join-motd.general.en")
         motd_es = config.getString("misc.join-events.join-motd.general.es")
+        motd_ja = config.getString("misc.join-events.join-motd.general.ja")
         first_join_motd = config.getString("misc.join-events.join-motd.first-join.en")
         first_join_motd_es = config.getString("misc.join-events.join-motd.first-join.es")
+        first_join_motd_ja = config.getString("misc.join-events.join-motd.first-join.ja")
         title_announcement_en = config.getString("misc.join-events.join-title-message.en")
         title_announcement_es = config.getString("misc.join-events.join-title-message.es")
+        title_announcement_ja = config.getString("misc.join-events.join-title-message.ja")
         actionbar_announcement_en = config.getString("misc.join-events.join-action-bar-message.en")
         actionbar_announcement_es = config.getString("misc.join-events.join-action-bar-message.es")
+        actionbar_announcement_ja = config.getString("misc.join-events.join-action-bar-message.ja")
         announcements_enabled = config.getBoolean("misc.announcements.enable")
         announcements_timer = config.getInt("misc.announcements.timer")
         announcements_interval = (20 * announcements_timer).toLong()
         announcements = config.getConfigurationSection("misc.announcements.messages")
+        announcements_autotranslate = config.getBoolean("misc.announcements.autotranslate")
         emergent_announcements_enabled = config.getBoolean("misc.emergent-announcements.enable")
         emergent_announcements_timer = config.getInt("misc.emergent-announcements.timer")
         emergent_announcements_interval = (20 * emergent_announcements_timer).toLong()
         emergent_announcements = config.getConfigurationSection("misc.emergent-announcements.messages")
+        emergent_announcements_autotranslate = config.getBoolean("misc.emergent-announcements.autotranslate")
 
         hookListeners()
         stopAnnouncements()
@@ -227,6 +249,28 @@ class Toms3Core : JavaPlugin() {
         }
     }
 
+    // Resolves the "lang" text for an announcement at "path". Manual config text always wins;
+    // if it's missing and autotranslate is on, this returns a cached auto-translation (falling
+    // back to English for this call while the translation is fetched asynchronously in the background).
+    fun resolveAnnouncementText(path: String, lang: String, enText: String, autotranslate: Boolean): String {
+        val configured = config.getString("$path.$lang")
+        if (!configured.isNullOrBlank()) return configured
+
+        if (!autotranslate || enText.isBlank()) return enText
+
+        val cacheKey = "$path.$lang"
+        announcementTranslationCache[cacheKey]?.let { return it }
+
+        Bukkit.getScheduler().runTaskAsynchronously(this, Runnable {
+            val translated = Translator.translate(enText, lang)
+            if (!translated.isNullOrBlank()) {
+                announcementTranslationCache[cacheKey] = translated
+            }
+        })
+
+        return enText
+    }
+
     private var announcementsTask: BukkitTask? = null
     fun sendAnnouncements(){
         announcementsTask?.cancel()
@@ -236,16 +280,16 @@ class Toms3Core : JavaPlugin() {
                 if (list.isNotEmpty()) {
                     val random = list.random()
                     val path = "misc.announcements.messages.$random"
-                    val msgEn = config.getString("$path.en")?.let { input -> minimessage.deserialize(input) }
-                        ?: Component.empty()
-                    val msgEs = config.getString("$path.es")?.let { input -> minimessage.deserialize(input) }
-                        ?: Component.empty()
+                    val enText = config.getString("$path.en") ?: ""
+                    val msgEn = if (enText.isNotBlank()) minimessage.deserialize(enText) else Component.empty()
 
                     for (player in Bukkit.getOnlinePlayers()) {
                         if (!haveAnnouncementsDisabled.contains(player.uniqueId)) {
                             val locale = player.locale().toString()
                             if (locale.startsWith("es") && spanish_enabled) {
-                                player.sendMessage(msgEs)
+                                player.sendMessage(minimessage.deserialize(resolveAnnouncementText(path, "es", enText, announcements_autotranslate)))
+                            } else if (locale.startsWith("ja") && japanese_enabled) {
+                                player.sendMessage(minimessage.deserialize(resolveAnnouncementText(path, "ja", enText, announcements_autotranslate)))
                             } else {
                                 player.sendMessage(msgEn)
                             }
@@ -270,15 +314,15 @@ class Toms3Core : JavaPlugin() {
                 if (list.isNotEmpty()) {
                     val random = list.random()
                     val path = "misc.emergent-announcements.messages.$random"
-                    val msgEn = config.getString("$path.en")?.let { input -> minimessage.deserialize(input) }
-                        ?: Component.empty()
-                    val msgEs = config.getString("$path.es")?.let { input -> minimessage.deserialize(input) }
-                        ?: Component.empty()
+                    val enText = config.getString("$path.en") ?: ""
+                    val msgEn = if (enText.isNotBlank()) minimessage.deserialize(enText) else Component.empty()
 
                     for (player in Bukkit.getOnlinePlayers()) {
                         val locale = player.locale().toString()
                         if (locale.startsWith("es") && spanish_enabled) {
-                            player.sendMessage(msgEs)
+                            player.sendMessage(minimessage.deserialize(resolveAnnouncementText(path, "es", enText, emergent_announcements_autotranslate)))
+                        } else if (locale.startsWith("ja") && japanese_enabled) {
+                            player.sendMessage(minimessage.deserialize(resolveAnnouncementText(path, "ja", enText, emergent_announcements_autotranslate)))
                         } else {
                             player.sendMessage(msgEn)
                         }

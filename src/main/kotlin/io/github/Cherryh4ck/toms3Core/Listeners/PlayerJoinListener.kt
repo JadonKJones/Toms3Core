@@ -25,6 +25,11 @@ class PlayerJoinListener(private val plugin: Toms3Core) : Listener {
                     player.showTitle(Title.title(plugin.minimessage.deserialize(plugin.title_announcement_es.toString()), Component.empty()))
                     player.sendActionBar(plugin.minimessage.deserialize(plugin.actionbar_announcement_es.toString()))
                 }
+                else if (playerLocale.startsWith("ja") && plugin.japanese_enabled){
+                    player.sendMessage(plugin.minimessage.deserialize(plugin.motd_ja.toString()))
+                    player.showTitle(Title.title(plugin.minimessage.deserialize(plugin.title_announcement_ja.toString()), Component.empty()))
+                    player.sendActionBar(plugin.minimessage.deserialize(plugin.actionbar_announcement_ja.toString()))
+                }
                 else {
                     player.sendMessage(plugin.minimessage.deserialize(plugin.motd_general.toString()))
                     player.showTitle(Title.title(plugin.minimessage.deserialize(plugin.title_announcement_en.toString()), Component.empty()))
@@ -32,10 +37,15 @@ class PlayerJoinListener(private val plugin: Toms3Core) : Listener {
                 }
             }
             else{
-                if (playerLocale.startsWith("es")){
+                if (playerLocale.startsWith("es") && plugin.spanish_enabled){
                     player.sendMessage(plugin.minimessage.deserialize(plugin.first_join_motd_es.toString()))
                     player.showTitle(Title.title(plugin.minimessage.deserialize(plugin.title_announcement_es.toString()), Component.empty()))
                     player.sendActionBar(plugin.minimessage.deserialize(plugin.actionbar_announcement_es.toString()))
+                }
+                else if (playerLocale.startsWith("ja") && plugin.japanese_enabled){
+                    player.sendMessage(plugin.minimessage.deserialize(plugin.first_join_motd_ja.toString()))
+                    player.showTitle(Title.title(plugin.minimessage.deserialize(plugin.title_announcement_ja.toString()), Component.empty()))
+                    player.sendActionBar(plugin.minimessage.deserialize(plugin.actionbar_announcement_ja.toString()))
                 }
                 else {
                     player.sendMessage(plugin.minimessage.deserialize(plugin.first_join_motd.toString()))

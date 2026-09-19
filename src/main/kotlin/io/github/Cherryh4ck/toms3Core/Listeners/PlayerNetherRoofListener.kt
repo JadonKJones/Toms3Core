@@ -32,6 +32,9 @@ class PlayerNetherRoofListener(private val plugin: Toms3Core) : Listener {
                 if (playerLocale.startsWith("es") && plugin.spanish_enabled){
                     player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} El techo del Nether está deshabilitado."))
                 }
+                else if (playerLocale.startsWith("ja") && plugin.japanese_enabled){
+                    player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} ネザーの天井は現在無効になっています。"))
+                }
                 else{
                     player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} Nether Roof is currently disabled."))
                 }
@@ -46,6 +49,9 @@ class PlayerNetherRoofListener(private val plugin: Toms3Core) : Listener {
                     player.teleport(loc)
                     if (playerLocale.startsWith("es") && plugin.spanish_enabled){
                         player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} No se pueden usar las elytras debajo de la bedrock debido a un exploit."))
+                    }
+                    else if (playerLocale.startsWith("ja") && plugin.japanese_enabled){
+                        player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} このエクスプロイトは現在無効になっています。"))
                     }
                     else{
                         player.sendMessage(plugin.minimessage.deserialize("<gold>${plugin.prefix} This travel exploit is currently disabled."))

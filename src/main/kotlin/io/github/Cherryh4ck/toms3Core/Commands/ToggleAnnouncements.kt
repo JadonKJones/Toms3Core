@@ -15,6 +15,7 @@ class ToggleAnnouncements(private val plugin : Toms3Core) : TabExecutor {
         if (sender is Player){
             val locale = sender.locale().toString()
             val isSpanish = locale.startsWith("es")
+            val isJapanese = locale.startsWith("ja")
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val playerData = File(plugin.playerDataPath, "${sender.name.lowercase()}.yml")
                 val config = YamlConfiguration.loadConfiguration(playerData)
@@ -32,6 +33,8 @@ class ToggleAnnouncements(private val plugin : Toms3Core) : TabExecutor {
                         plugin.haveAnnouncementsDisabled.add(sender.uniqueId)
                         message = if (isSpanish && plugin.spanish_enabled) {
                             plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_off_es}")
+                        } else if (isJapanese && plugin.japanese_enabled) {
+                            plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_off_ja}")
                         } else {
                             plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_off_en}")
                         }
@@ -39,6 +42,8 @@ class ToggleAnnouncements(private val plugin : Toms3Core) : TabExecutor {
                         plugin.haveAnnouncementsDisabled.remove(sender.uniqueId)
                         message = if (isSpanish && plugin.spanish_enabled) {
                             plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_on_es}")
+                        } else if (isJapanese && plugin.japanese_enabled) {
+                            plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_on_ja}")
                         } else {
                             plugin.minimessage.deserialize("${plugin.prefix} ${plugin.toggleannouncements_message_on_en}")
                         }

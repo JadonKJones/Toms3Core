@@ -29,18 +29,24 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
         val targetUser : String
         val userLocale : String
         val isSpanish : Boolean
+        val isJapanese : Boolean
 
         if (sender is Player){
             userLocale = sender.locale().toString()
             isSpanish = userLocale.startsWith("es")
+            isJapanese = userLocale.startsWith("ja")
         }
         else{
             isSpanish = true
+            isJapanese = false
         }
 
         if (args.isEmpty()){
             val mensaje = if (isSpanish && plugin.spanish_enabled) {
                 minimessage.deserialize("${plugin.prefix} <red>No puedes usar este comando sin poner el nombre de un jugador.</red>")
+            }
+            else if (isJapanese && plugin.japanese_enabled) {
+                minimessage.deserialize("${plugin.prefix} <red>プレイヤー名を指定せずにこのコマンドを使用することはできません。</red>")
             }
             else {
                 minimessage.deserialize("${plugin.prefix} <red>You cannot use this command without putting the name of a player.</red>")
@@ -56,6 +62,9 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
             val mensaje = if (isSpanish && plugin.spanish_enabled) {
                 minimessage.deserialize("${plugin.prefix} <red>$targetUser no es un nombre de jugador válido.</red>")
             }
+            else if (isJapanese && plugin.japanese_enabled) {
+                minimessage.deserialize("${plugin.prefix} <red>$targetUser は有効なプレイヤー名ではありません。</red>")
+            }
             else {
                 minimessage.deserialize("${plugin.prefix} <red>$targetUser is not a valid player name.</red>")
             }
@@ -70,6 +79,9 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
                 val message = if (isSpanish && plugin.spanish_enabled){
                     minimessage.deserialize("${plugin.prefix} <red>${targetUser} nunca entró al servidor o no está en el cache del servidor.</red>")
                 }
+                else if (isJapanese && plugin.japanese_enabled){
+                    minimessage.deserialize("${plugin.prefix} <red>${targetUser} はサーバーに参加したことがないか、サーバーのキャッシュにありません。</red>")
+                }
                 else{
                     minimessage.deserialize("${plugin.prefix} <red>${targetUser} has never entered the server or is not in the server cache.</red>")
                 }
@@ -80,6 +92,9 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
             else if (player != null && player.isConnected){
                 val message = if (isSpanish && plugin.spanish_enabled){
                     minimessage.deserialize("${plugin.prefix} <red>No puedes usar este comando porque ${targetUser} está conectado.</red>")
+                }
+                else if (isJapanese && plugin.japanese_enabled){
+                    minimessage.deserialize("${plugin.prefix} <red>${targetUser} は現在接続中のため、このコマンドは使用できません。</red>")
                 }
                 else{
                     minimessage.deserialize("${plugin.prefix} <red>You cannot use this command because ${targetUser} is connected.</red>")
@@ -105,6 +120,8 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
             if (unixTime.toInt() != 0){
                 val format = if (isSpanish && plugin.spanish_enabled) {
                     SimpleDateFormat("dd/MM/yyyy HH:mm")
+                } else if (isJapanese && plugin.japanese_enabled) {
+                    SimpleDateFormat("yyyy/MM/dd HH:mm")
                 } else {
                     SimpleDateFormat("MM/dd/yyyy hh:mm a")
                 }
@@ -112,6 +129,9 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
 
                 val message = if (isSpanish && plugin.spanish_enabled){
                     minimessage.deserialize("${plugin.prefix} <gold><bold>${username}</bold> fue visto por última vez el <bold>${result}</bold>.</gold>")
+                }
+                else if (isJapanese && plugin.japanese_enabled){
+                    minimessage.deserialize("${plugin.prefix} <gold><bold>${username}</bold> が最後に見られたのは <bold>${result}</bold> です。</gold>")
                 }
                 else{
                     minimessage.deserialize("${plugin.prefix} <gold><bold>${username}</bold> was last seen on <bold>${result}</bold>.</gold>")
@@ -122,6 +142,9 @@ class LastSeen(private val plugin : Toms3Core) : TabExecutor {
             else{
                 val message = if (isSpanish && plugin.spanish_enabled){
                     minimessage.deserialize("${plugin.prefix} <red>${targetUser} nunca entró al servidor o no está en el cache del servidor.</red>")
+                }
+                else if (isJapanese && plugin.japanese_enabled){
+                    minimessage.deserialize("${plugin.prefix} <red>${targetUser} はサーバーに参加したことがないか、サーバーのキャッシュにありません。</red>")
                 }
                 else{
                     minimessage.deserialize("${plugin.prefix} <red>${targetUser} has never entered the server or is not in the server cache.</red>")

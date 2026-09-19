@@ -25,6 +25,7 @@ class Dupe(private val plugin : Toms3Core) : TabExecutor {
         if (sender is Player) {
             val locale = sender.locale().toString()
             val isSpanish = locale.startsWith("es") // le isspanish
+            val isJapanese = locale.startsWith("ja")
             val playerDataCache = File(plugin.playerDataPath, "${sender.name.lowercase()}.yml")
             val config = YamlConfiguration.loadConfiguration(playerDataCache)
             val alreadyFallen = config.getBoolean("fallen-for-dupe")
@@ -32,6 +33,9 @@ class Dupe(private val plugin : Toms3Core) : TabExecutor {
             if (alreadyFallen) {
                 if (isSpanish && plugin.spanish_enabled) {
                     sender.sendMessage(minimessage.deserialize("${plugin.prefix} <red>No seas idiota, newfag.</red>"))
+                }
+                else if (isJapanese && plugin.japanese_enabled) {
+                    sender.sendMessage(minimessage.deserialize("${plugin.prefix} <red>バカなことすんなよ、newfag。</red>"))
                 }
                 else {
                     sender.sendMessage(minimessage.deserialize("${plugin.prefix} <red>Don't be an idiot, newfag.</red>"))
@@ -46,14 +50,28 @@ class Dupe(private val plugin : Toms3Core) : TabExecutor {
                 })
             }
 
-            val joinMessage = if (isSpanish && plugin.spanish_enabled) { minimessage.deserialize("<gray>popbob se unió al servidor.</gray>") } else { minimessage.deserialize("<gray>popbob has joined the server.</gray>") }
-            val hallOfShameMessage = if (isSpanish && plugin.spanish_enabled) { minimessage.deserialize("<red>Ahora estás en la lista de jugadores lamentables.</red>") } else { minimessage.deserialize("<red>You have been added to the Hall of Shame.</red>") }
+            val joinMessage = if (isSpanish && plugin.spanish_enabled) { minimessage.deserialize("<gray>popbob se unió al servidor.</gray>") } else if (isJapanese && plugin.japanese_enabled) { minimessage.deserialize("<gray>popbobがサーバーに参加しました。</gray>") } else { minimessage.deserialize("<gray>popbob has joined the server.</gray>") }
+            val hallOfShameMessage = if (isSpanish && plugin.spanish_enabled) { minimessage.deserialize("<red>Ahora estás en la lista de jugadores lamentables.</red>") } else if (isJapanese && plugin.japanese_enabled) { minimessage.deserialize("<red>あなたは恥の殿堂入りしました。</red>") } else { minimessage.deserialize("<red>You have been added to the Hall of Shame.</red>") }
             sender.sendMessage(joinMessage)
             Bukkit.getScheduler().runTaskLater(plugin, Runnable {
-                sender.sendMessage("${sender.name} » popbob my coords are ${sender.x.toInt().toString()} ${sender.z.toInt().toString()} come get me please")
+                val coordsMessage = if (isSpanish && plugin.spanish_enabled) {
+                    "${sender.name} » popbob mis coordenadas son ${sender.x.toInt()} ${sender.z.toInt()} ven a buscarme porfa"
+                } else if (isJapanese && plugin.japanese_enabled) {
+                    "${sender.name} » popbob 座標は${sender.x.toInt()} ${sender.z.toInt()}だよ、助けに来て"
+                } else {
+                    "${sender.name} » popbob my coords are ${sender.x.toInt()} ${sender.z.toInt()} come get me please"
+                }
+                sender.sendMessage(coordsMessage)
             }, 20L)
             Bukkit.getScheduler().runTaskLater(plugin, Runnable {
-                sender.sendMessage("popbob » ur fucked, im coming")
+                val comingMessage = if (isSpanish && plugin.spanish_enabled) {
+                    "popbob » estás jodido, voy para allá"
+                } else if (isJapanese && plugin.japanese_enabled) {
+                    "popbob » お前終わったな、今行くぞ"
+                } else {
+                    "popbob » ur fucked, im coming"
+                }
+                sender.sendMessage(comingMessage)
                 val health = sender.health - 1.0
                 sender.damage(health)
                 sender.addPotionEffect(drunkness)
@@ -74,6 +92,9 @@ class Dupe(private val plugin : Toms3Core) : TabExecutor {
                     val locale = player.locale().toString()
                     if (locale.startsWith("es") && plugin.spanish_enabled) {
                         player.sendMessage(minimessage.deserialize("<gray>${sender.name} fue agregado a la <light_purple>lista de jugadores miserables</light_purple>."))
+                    }
+                    else if (locale.startsWith("ja") && plugin.japanese_enabled) {
+                        player.sendMessage(minimessage.deserialize("<gray>${sender.name}が<light_purple>恥の殿堂</light_purple>に追加されました。"))
                     }
                     else{
                         player.sendMessage(minimessage.deserialize("<gray>${sender.name} has been added to the <light_purple>Hall of Shame</light_purple>."))
